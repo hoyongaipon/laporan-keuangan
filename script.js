@@ -1,12 +1,12 @@
 // 🔧 konfigurasi Firebase (ganti dengan punyamu)
 const firebaseConfig = {
-  apiKey: "API_KEY_MU",
-  authDomain: "PROJECT_ID.firebaseapp.com",
+  apiKey: "AIzaSyBBhDsj86fCeWdySGPsgGa79FKEZqu2iak",
+  authDomain: "laporan-keuangan-roti-bakar.firebaseapp.com",
   databaseURL: "https://PROJECT_ID.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "APP_ID"
+  projectId: "laporan-keuangan-roti-bakar",
+  storageBucket: "laporan-keuangan-roti-bakar.firebasestorage.app",
+  messagingSenderId: "78916381045",
+  appId: "1:78916381045:web:ea1a2406ba2864b61dcb3c"
 };
 
 const app = firebase.initializeApp(firebaseConfig);
