@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Keuangan Roti Bakar Sari Edo Group</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Laporan Keuangan<br>Roti Bakar Sari Edo Group</h2>
+
+  <table id="laporanTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Tanggal</th>
+        <th>Menu Pembelian</th>
+        <th>Rasa Roti</th>
+        <th>PCS</th>
+        <th>Harga Satuan (Rp)</th>
+        <th>Harga Total (Rp)</th>
+        <th>Saldo (Rp)</th>
+        <th>Barang Masuk</th>
+        <th>Total Pengeluaran (Rp)</th>
+        <th>Nama Barang Pengeluaran</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="6">TOTAL</th>
+        <th id="totalHarga">0</th>
+        <th id="totalSaldo">0</th>
+        <th></th>
+        <th id="totalPengeluaran">0</th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="summary">Saldo Akhir: Rp <span id="saldoAkhir">0</span></div>
+
+  <button class="btn" onclick="tambahBaris()">+ Tambah Baris</button>
+  <button class="btn" onclick="simpanData()">💾 Save</button>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
