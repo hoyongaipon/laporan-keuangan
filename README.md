@@ -1,13 +1,13 @@
 # 📊 Laporan Keuangan - Roti Bakar Sari Edo Group
 
-Aplikasi web sederhana untuk mencatat laporan keuangan:
+Aplikasi web sederhana untuk mencatat laporan keuangan.
 
 ## ✨ Fitur
 - Kolom: No, Tanggal, Nama Menu, Harga, PCS, Pemasukan, Pengeluaran, Total, Keterangan.
 - Hitung otomatis:
   - Harga × PCS = Pemasukan
   - Pemasukan – Pengeluaran = Total
-  - Jumlah semua kolom Total = **Total Keseluruhan**
+  - Jumlah semua baris Total = **Total Keseluruhan**
 - Tekan **Enter di kolom PCS** → tambah baris baru dengan tanggal sama
 - Simpan data ke **localStorage**
 - Export ke **Excel (CSV)**
