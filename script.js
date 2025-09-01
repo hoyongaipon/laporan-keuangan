@@ -1,96 +1,95 @@
-// 🔧 konfigurasi Firebase (ganti dengan punyamu)
-const firebaseConfig = {
-  apiKey: "AIzaSyBBhDsj86fCeWdySGPsgGa79FKEZqu2iak",
-  authDomain: "laporan-keuangan-roti-bakar.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID.firebaseio.com",
-  projectId: "laporan-keuangan-roti-bakar",
-  storageBucket: "laporan-keuangan-roti-bakar.firebasestorage.app",
-  messagingSenderId: "78916381045",
-  appId: "1:78916381045:web:ea1a2406ba2864b61dcb3c"
-};
+const table = document.getElementById("laporan").getElementsByTagName("tbody")[0];
 
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-function tambahBaris(data = {}) {
-  let table = document.querySelector("#laporanTable tbody");
-  let rowCount = table.rows.length + 1;
-  let row = table.insertRow();
-
+function addRow(copyTanggal = "") {
+  const rowCount = table.rows.length + 1;
+  const row = table.insertRow();
   row.innerHTML = `
     <td>${rowCount}</td>
-    <td><input type="date" value="${data.tanggal || ""}"></td>
-    <td><input type="text" value="${data.menu || ""}"></td>
-    <td><input type="text" value="${data.rasa || ""}"></td>
-    <td><input type="number" class="pcs" value="${data.pcs || 0}"></td>
-    <td><input type="number" class="harga" value="${data.harga || 0}"></td>
-    <td class="hargaTotal">0</td>
-    <td class="saldo">0</td>
-    <td><input type="text" value="${data.barangMasuk || ""}"></td>
-    <td><input type="number" class="pengeluaran" value="${data.pengeluaran || 0}"></td>
-    <td><input type="text" value="${data.namaPengeluaran || ""}"></td>
+    <td><input type="date" value="${copyTanggal}"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
   `;
-  tambahEventListeners();
-  hitung();
 }
 
-function hitung() {
-  let rows = document.querySelectorAll("#laporanTable tbody tr");
-  let totalHarga = 0, totalSaldo = 0, totalPengeluaran = 0;
+function handleEnter(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const row = event.target.closest("tr");
+    const tanggalInput = row.cells[1].querySelector("input");
+    const copyTanggal = tanggalInput ? tanggalInput.value : "";
+    addRow(copyTanggal);
+    updateTotals();
+  }
+}
 
-  rows.forEach(row => {
-    let pcs = parseInt(row.querySelector(".pcs").value) || 0;
-    let harga = parseInt(row.querySelector(".harga").value) || 0;
-    let pengeluaran = parseInt(row.querySelector(".pengeluaran").value) || 0;
-
-    let hargaTotal = pcs * harga;
-    row.querySelector(".hargaTotal").textContent = hargaTotal;
-
-    let saldo = hargaTotal;
-    row.querySelector(".saldo").textContent = saldo;
-
-    totalHarga += hargaTotal;
-    totalSaldo += saldo;
-    totalPengeluaran += pengeluaran;
+function updateTotals() {
+  let totalMasuk = 0, totalKeluar = 0;
+  Array.from(table.rows).forEach(row => {
+    let masuk = parseInt(row.cells[4].innerText.replace(/\D/g,'')) || 0;
+    let keluar = parseInt(row.cells[5].innerText.replace(/\D/g,'')) || 0;
+    totalMasuk += masuk;
+    totalKeluar += keluar;
   });
-
-  document.getElementById("totalHarga").textContent = totalHarga;
-  document.getElementById("totalSaldo").textContent = totalSaldo;
-  document.getElementById("totalPengeluaran").textContent = totalPengeluaran;
-  document.getElementById("saldoAkhir").textContent = totalSaldo - totalPengeluaran;
+  document.getElementById("totalMasuk").innerText = "Rp" + totalMasuk.toLocaleString();
+  document.getElementById("totalKeluar").innerText = "Rp" + totalKeluar.toLocaleString();
 }
 
-function tambahEventListeners() {
-  document.querySelectorAll(".pcs, .harga, .pengeluaran").forEach(input => {
-    input.removeEventListener("input", hitung);
-    input.addEventListener("input", hitung);
-  });
-}
+table.addEventListener("input", updateTotals);
 
-function simpanData() {
-  let rows = document.querySelectorAll("#laporanTable tbody tr");
+function saveData() {
   let data = [];
-  rows.forEach(row => {
-    data.push({
-      tanggal: row.cells[1].querySelector("input").value,
-      menu: row.cells[2].querySelector("input").value,
-      rasa: row.cells[3].querySelector("input").value,
-      pcs: row.cells[4].querySelector("input").value,
-      harga: row.cells[5].querySelector("input").value,
-      barangMasuk: row.cells[8].querySelector("input").value,
-      pengeluaran: row.cells[9].querySelector("input").value,
-      namaPengeluaran: row.cells[10].querySelector("input").value,
-    });
+  Array.from(table.rows).forEach(row => {
+    let rowData = [];
+    for (let i = 0; i < row.cells.length; i++) {
+      let input = row.cells[i].querySelector("input");
+      rowData.push(input ? input.value : row.cells[i].innerText);
+    }
+    data.push(rowData);
   });
-
-  db.ref("laporan").set(data);
-  alert("✅ Data berhasil disimpan!");
+  localStorage.setItem("laporanKeuangan", JSON.stringify(data));
+  alert("Data berhasil disimpan!");
 }
 
-// saat pertama kali buka, ambil data dari Firebase
-db.ref("laporan").on("value", snapshot => {
-  let tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-  let data = snapshot.val() || [];
-  data.forEach(item => tambahBaris(item));
-});
+function loadData() {
+  let data = JSON.parse(localStorage.getItem("laporanKeuangan"));
+  if (data) {
+    table.innerHTML = "";
+    data.forEach((rowData, index) => {
+      const row = table.insertRow();
+      rowData.forEach((cell, i) => {
+        let newCell = row.insertCell();
+        if (i === 1) {
+          newCell.innerHTML = `<input type="date" value="${cell}">`;
+        } else {
+          if (i === 0) newCell.innerText = index + 1;
+          else newCell.contentEditable = "true", newCell.innerText = cell;
+        }
+      });
+    });
+  }
+  updateTotals();
+}
+
+function downloadExcel() {
+  let csv = [];
+  let rows = document.querySelectorAll("table tr");
+  for (let row of rows) {
+    let cols = row.querySelectorAll("td, th");
+    let rowData = [];
+    for (let col of cols) {
+      let input = col.querySelector("input");
+      rowData.push(input ? input.value : col.innerText);
+    }
+    csv.push(rowData.join(","));
+  }
+  let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+  let downloadLink = document.createElement("a");
+  downloadLink.download = "Laporan_Keuangan.csv";
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.click();
+}
+
+loadData();
