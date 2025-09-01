@@ -18,6 +18,7 @@ function hitungSaldo() {
     totalKeseluruhan += total;
   }
   totalKeseluruhanEl.value = totalKeseluruhan;
+  simpanData(); // auto save tiap kali hitung
 }
 
 // Tambah baris baru
@@ -75,7 +76,31 @@ function simpanData() {
     });
   }
   localStorage.setItem("laporanData", JSON.stringify(data));
-  alert("✅ Data berhasil disimpan!");
+}
+
+// Load data dari localStorage
+function loadData() {
+  let data = JSON.parse(localStorage.getItem("laporanData")) || [];
+  if (data.length > 0) {
+    for (let i = 0; i < data.length; i++) {
+      let row = table.insertRow();
+      row.innerHTML = `
+        <td>${i+1}</td>
+        <td><input type="date" value="${data[i].tanggal}"></td>
+        <td><input type="text" value="${data[i].menu}"></td>
+        <td><input type="number" value="${data[i].harga}"></td>
+        <td><input type="number" value="${data[i].pcs}"></td>
+        <td><input type="number" value="${data[i].pemasukan}" readonly></td>
+        <td><input type="number" value="${data[i].pengeluaran}"></td>
+        <td><input type="number" value="${data[i].total}" readonly></td>
+        <td><input type="text" value="${data[i].ket}"></td>
+      `;
+    }
+  } else {
+    tambahBaris();
+  }
+  tambahListener();
+  hitungSaldo();
 }
 
 // Download ke Excel (CSV)
@@ -107,7 +132,4 @@ function downloadExcel() {
   link.click();
 }
 
-window.onload = () => {
-  tambahListener();
-  hitungSaldo();
-};
+window.onload = loadData;
