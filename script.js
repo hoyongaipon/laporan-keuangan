@@ -1,95 +1,107 @@
-const table = document.getElementById("laporan").getElementsByTagName("tbody")[0];
+const table = document.getElementById("laporanTable").getElementsByTagName("tbody")[0];
 
-function addRow(copyTanggal = "") {
-  const rowCount = table.rows.length + 1;
-  const row = table.insertRow();
-  row.innerHTML = `
-    <td>${rowCount}</td>
-    <td><input type="date" value="${copyTanggal}"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-  `;
-}
+// Hitung otomatis pemasukan & total
+function hitungSaldo() {
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = table.rows[i];
+    let harga = parseFloat(row.cells[3].children[0].value) || 0;
+    let pcs = parseFloat(row.cells[4].children[0].value) || 0;
+    let pemasukan = harga * pcs;
+    row.cells[5].children[0].value = pemasukan;
 
-function handleEnter(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    const row = event.target.closest("tr");
-    const tanggalInput = row.cells[1].querySelector("input");
-    const copyTanggal = tanggalInput ? tanggalInput.value : "";
-    addRow(copyTanggal);
-    updateTotals();
+    let pengeluaran = parseFloat(row.cells[6].children[0].value) || 0;
+    let total = pemasukan - pengeluaran;
+    row.cells[7].children[0].value = total;
   }
 }
 
-function updateTotals() {
-  let totalMasuk = 0, totalKeluar = 0;
-  Array.from(table.rows).forEach(row => {
-    let masuk = parseInt(row.cells[4].innerText.replace(/\D/g,'')) || 0;
-    let keluar = parseInt(row.cells[5].innerText.replace(/\D/g,'')) || 0;
-    totalMasuk += masuk;
-    totalKeluar += keluar;
-  });
-  document.getElementById("totalMasuk").innerText = "Rp" + totalMasuk.toLocaleString();
-  document.getElementById("totalKeluar").innerText = "Rp" + totalKeluar.toLocaleString();
+// Tambah baris baru
+function tambahBaris(copyTanggal = false, tanggalSebelumnya = "") {
+  let rowCount = table.rows.length;
+  let row = table.insertRow();
+  row.innerHTML = `
+    <td>${rowCount+1}</td>
+    <td><input type="date" value="${copyTanggal ? tanggalSebelumnya : ""}"></td>
+    <td><input type="text"></td>
+    <td><input type="number" value="0"></td>
+    <td><input type="number" value="0"></td>
+    <td><input type="number" value="0" readonly></td>
+    <td><input type="number" value="0"></td>
+    <td><input type="number" value="0" readonly></td>
+    <td><input type="text"></td>
+  `;
+  tambahListener();
+  hitungSaldo();
 }
 
-table.addEventListener("input", updateTotals);
+// Listener otomatis
+function tambahListener() {
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = table.rows[i];
+    row.cells[3].children[0].addEventListener("input", hitungSaldo);
+    row.cells[4].children[0].addEventListener("input", hitungSaldo);
+    row.cells[6].children[0].addEventListener("input", hitungSaldo);
 
-function saveData() {
-  let data = [];
-  Array.from(table.rows).forEach(row => {
-    let rowData = [];
-    for (let i = 0; i < row.cells.length; i++) {
-      let input = row.cells[i].querySelector("input");
-      rowData.push(input ? input.value : row.cells[i].innerText);
-    }
-    data.push(rowData);
-  });
-  localStorage.setItem("laporanKeuangan", JSON.stringify(data));
-  alert("Data berhasil disimpan!");
-}
-
-function loadData() {
-  let data = JSON.parse(localStorage.getItem("laporanKeuangan"));
-  if (data) {
-    table.innerHTML = "";
-    data.forEach((rowData, index) => {
-      const row = table.insertRow();
-      rowData.forEach((cell, i) => {
-        let newCell = row.insertCell();
-        if (i === 1) {
-          newCell.innerHTML = `<input type="date" value="${cell}">`;
-        } else {
-          if (i === 0) newCell.innerText = index + 1;
-          else newCell.contentEditable = "true", newCell.innerText = cell;
-        }
-      });
+    // Enter di pemasukan → baris baru
+    row.cells[5].children[0].addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        let tgl = row.cells[1].children[0].value;
+        tambahBaris(true, tgl);
+      }
     });
   }
-  updateTotals();
 }
 
-function downloadExcel() {
-  let csv = [];
-  let rows = document.querySelectorAll("table tr");
-  for (let row of rows) {
-    let cols = row.querySelectorAll("td, th");
-    let rowData = [];
-    for (let col of cols) {
-      let input = col.querySelector("input");
-      rowData.push(input ? input.value : col.innerText);
-    }
-    csv.push(rowData.join(","));
+// Save ke localStorage
+function simpanData() {
+  let data = [];
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = table.rows[i];
+    data.push({
+      no: row.cells[0].innerText,
+      tanggal: row.cells[1].children[0].value,
+      menu: row.cells[2].children[0].value,
+      harga: row.cells[3].children[0].value,
+      pcs: row.cells[4].children[0].value,
+      pemasukan: row.cells[5].children[0].value,
+      pengeluaran: row.cells[6].children[0].value,
+      total: row.cells[7].children[0].value,
+      ket: row.cells[8].children[0].value
+    });
   }
-  let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-  let downloadLink = document.createElement("a");
-  downloadLink.download = "Laporan_Keuangan.csv";
-  downloadLink.href = window.URL.createObjectURL(csvFile);
-  downloadLink.click();
+  localStorage.setItem("laporanData", JSON.stringify(data));
+  alert("✅ Data berhasil disimpan!");
 }
 
-loadData();
+// Download ke Excel
+function downloadExcel() {
+  let data = [["No","Tanggal","Nama Menu","Harga","PCS","Pemasukan","Pengeluaran","Total","Keterangan"]];
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = table.rows[i];
+    data.push([
+      row.cells[0].innerText,
+      row.cells[1].children[0].value,
+      row.cells[2].children[0].value,
+      row.cells[3].children[0].value,
+      row.cells[4].children[0].value,
+      row.cells[5].children[0].value,
+      row.cells[6].children[0].value,
+      row.cells[7].children[0].value,
+      row.cells[8].children[0].value
+    ]);
+  }
+
+  let csvContent = "data:text/csv;charset=utf-8," 
+    + data.map(e => e.join(",")).join("\n");
+
+  let link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", "laporan_keuangan.csv");
+  document.body.appendChild(link);
+  link.click();
+}
+
+window.onload = () => {
+  tambahListener();
+  hitungSaldo();
+};
