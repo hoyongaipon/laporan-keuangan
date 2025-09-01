@@ -6,45 +6,44 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Laporan Keuangan<br>Roti Bakar Sari Edo Group</h2>
+  <h2>Laporan Keuangan Roti Bakar Sari Edo Group</h2>
 
-  <table id="laporanTable">
+  <div class="controls">
+    <button class="btn-add" onclick="addRow()">Tambah Baris</button>
+    <button class="btn-save" onclick="saveData()">Save</button>
+    <button class="btn-download" onclick="downloadExcel()">Download Excel</button>
+  </div>
+
+  <table id="laporan">
     <thead>
       <tr>
         <th>No</th>
         <th>Tanggal</th>
-        <th>Menu Pembelian</th>
-        <th>Rasa Roti</th>
-        <th>PCS</th>
-        <th>Harga Satuan (Rp)</th>
-        <th>Harga Total (Rp)</th>
-        <th>Saldo (Rp)</th>
-        <th>Barang Masuk</th>
-        <th>Total Pengeluaran (Rp)</th>
-        <th>Nama Barang Pengeluaran</th>
+        <th>Nama Menu</th>
+        <th>Harga (Rp)</th>
+        <th>Pemasukan (Rp)</th>
+        <th>Pengeluaran (Rp)</th>
+        <th>Belanja</th>
       </tr>
     </thead>
-    <tbody id="tbody">
-    </tbody>
-    <tfoot>
+    <tbody onkeydown="handleEnter(event)">
       <tr>
-        <th colspan="6">TOTAL</th>
-        <th id="totalHarga">0</th>
-        <th id="totalSaldo">0</th>
-        <th></th>
-        <th id="totalPengeluaran">0</th>
-        <th></th>
+        <td>1</td>
+        <td><input type="date"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
       </tr>
-    </tfoot>
+    </tbody>
   </table>
 
-  <div class="summary">Saldo Akhir: Rp <span id="saldoAkhir">0</span></div>
+  <div class="totals">
+    Total Pemasukan: <span id="totalMasuk">Rp0</span> | 
+    Total Pengeluaran: <span id="totalKeluar">Rp0</span>
+  </div>
 
-  <button class="btn" onclick="tambahBaris()">+ Tambah Baris</button>
-  <button class="btn" onclick="simpanData()">💾 Save</button>
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
