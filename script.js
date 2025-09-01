@@ -21,13 +21,15 @@ function hitungSaldo() {
   simpanData(); // auto save tiap kali hitung
 }
 
-// Tambah baris baru
-function tambahBaris(copyTanggal = false, tanggalSebelumnya = "") {
+// Tambah baris baru (salin tanggal dari baris sebelumnya)
+function tambahBaris() {
   let rowCount = table.rows.length;
+  let tanggalSebelumnya = rowCount > 0 ? table.rows[rowCount-1].cells[1].children[0].value : "";
+
   let row = table.insertRow();
   row.innerHTML = `
     <td>${rowCount+1}</td>
-    <td><input type="date" value="${copyTanggal ? tanggalSebelumnya : ""}"></td>
+    <td><input type="date" value="${tanggalSebelumnya}"></td>
     <td><input type="text"></td>
     <td><input type="number" value="0"></td>
     <td><input type="number" value="0"></td>
@@ -47,14 +49,6 @@ function tambahListener() {
     row.cells[3].children[0].addEventListener("input", hitungSaldo);
     row.cells[4].children[0].addEventListener("input", hitungSaldo);
     row.cells[6].children[0].addEventListener("input", hitungSaldo);
-
-    // Enter di kolom PCS → tambah baris baru
-    row.cells[4].children[0].addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        let tgl = row.cells[1].children[0].value;
-        tambahBaris(true, tgl);
-      }
-    });
   }
 }
 
