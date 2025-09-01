@@ -1,7 +1,9 @@
 const table = document.getElementById("laporanTable").getElementsByTagName("tbody")[0];
+const totalKeseluruhanEl = document.getElementById("totalKeseluruhan");
 
 // Hitung otomatis pemasukan & total
 function hitungSaldo() {
+  let totalKeseluruhan = 0;
   for (let i = 0; i < table.rows.length; i++) {
     let row = table.rows[i];
     let harga = parseFloat(row.cells[3].children[0].value) || 0;
@@ -12,7 +14,10 @@ function hitungSaldo() {
     let pengeluaran = parseFloat(row.cells[6].children[0].value) || 0;
     let total = pemasukan - pengeluaran;
     row.cells[7].children[0].value = total;
+
+    totalKeseluruhan += total;
   }
+  totalKeseluruhanEl.value = totalKeseluruhan;
 }
 
 // Tambah baris baru
@@ -42,8 +47,8 @@ function tambahListener() {
     row.cells[4].children[0].addEventListener("input", hitungSaldo);
     row.cells[6].children[0].addEventListener("input", hitungSaldo);
 
-    // Enter di pemasukan → baris baru
-    row.cells[5].children[0].addEventListener("keydown", (e) => {
+    // Enter di kolom PCS → tambah baris baru
+    row.cells[4].children[0].addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         let tgl = row.cells[1].children[0].value;
         tambahBaris(true, tgl);
@@ -73,7 +78,7 @@ function simpanData() {
   alert("✅ Data berhasil disimpan!");
 }
 
-// Download ke Excel
+// Download ke Excel (CSV)
 function downloadExcel() {
   let data = [["No","Tanggal","Nama Menu","Harga","PCS","Pemasukan","Pengeluaran","Total","Keterangan"]];
   for (let i = 0; i < table.rows.length; i++) {
@@ -90,6 +95,7 @@ function downloadExcel() {
       row.cells[8].children[0].value
     ]);
   }
+  data.push(["","","","","","","TOTAL KESELURUHAN", totalKeseluruhanEl.value, ""]);
 
   let csvContent = "data:text/csv;charset=utf-8," 
     + data.map(e => e.join(",")).join("\n");
