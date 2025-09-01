@@ -14,5 +14,11 @@ Dibuat menggunakan **HTML, CSS, dan JavaScript (tanpa framework)**.
 ## 🚀 Cara Pakai
 1. Clone repository:
    ```bash
-   git clone https://github.com/username/laporan-keuangan-roti-bakar.git
+   git clone https://github.com/hoyongaipon/laporan-keuangan-roti-bakar.git
    cd laporan-keuangan-roti-bakar
+   
+laporan-keuangan-roti-bakar/
+│── index.html
+│── style.css
+│── script.js
+│── README.md
