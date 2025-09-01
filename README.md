@@ -8,7 +8,7 @@ Aplikasi web sederhana untuk mencatat laporan keuangan.
   - Harga × PCS = Pemasukan
   - Pemasukan – Pengeluaran = Total
   - Jumlah semua baris Total = **Total Keseluruhan**
-- Tekan **Enter di kolom PCS** → tambah baris baru dengan tanggal sama
+- Tombol **Tambah Baris** → menyalin tanggal dari baris sebelumnya
 - **Auto Save ke localStorage** (data tidak hilang meski reload)
 - Export ke **Excel (CSV)**
 
