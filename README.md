@@ -9,7 +9,7 @@ Aplikasi web sederhana untuk mencatat laporan keuangan.
   - Pemasukan – Pengeluaran = Total
   - Jumlah semua baris Total = **Total Keseluruhan**
 - Tekan **Enter di kolom PCS** → tambah baris baru dengan tanggal sama
-- Simpan data ke **localStorage**
+- **Auto Save ke localStorage** (data tidak hilang meski reload)
 - Export ke **Excel (CSV)**
 
 ## 🚀 Cara Pakai
